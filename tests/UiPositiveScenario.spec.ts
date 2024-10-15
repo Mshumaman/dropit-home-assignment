@@ -87,10 +87,6 @@ test.describe('E2E Purchase Flow for Dropit Assignment', () => {
             await cartPage.clickOnCheckoutButton();
         });
 
-        await test.step('Validate Total Amount', async () => {
-            await checkoutPage.validateTotalAmount(TOTAL_AMOUNT);
-        });
-
         await test.step('Fill in Checkout Information', async () => {
             await checkoutPage.selectCountryOrRegion();
             await checkoutPage.fillPersonalDetails(randomEmail, randomFirstName, randomLastName, randomAddress, randomCity);
@@ -100,6 +96,10 @@ test.describe('E2E Purchase Flow for Dropit Assignment', () => {
             await checkoutPage.fillCreditCardDetails(CC_NUMBER, CC_EXPIRY, CC_CVV, CC_NAME);
         });
 
+        await test.step('Validate Total Amount', async () => {
+            await checkoutPage.validateTotalAmount(TOTAL_AMOUNT);
+        });
+        
         await test.step('Complete Purchase', async () => {
             await checkoutPage.clickOnPayNowButton();
         });
