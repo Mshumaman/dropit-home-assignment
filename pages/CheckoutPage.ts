@@ -1,4 +1,5 @@
 import BasePage from "./BasePage";
+import {expect} from "@playwright/test";
 
 export default class CheckoutPage extends BasePage{
     private emailOrMobileField = '[id="email"]';
@@ -11,14 +12,20 @@ export default class CheckoutPage extends BasePage{
     private cardCvvField = 'iframe[name*="card-fields-verification_value-"]';
     private nameOnCardField = 'iframe[name*="card-fields-name-"]';
     private payNowButton = '[id="checkout-pay-button"]';
+    private invalidEmailMessage = '#error-for-email';
+    private invalidCreditCardMessage = '#error-for-number';
 
 
     public async fillPersonalDetails(emailOrMobile: string, firstName: string, lastName: string, address: string, city: string) {
-        await this.page.locator(this.emailOrMobileField).fill(emailOrMobile);
+        await this.fillEmailOrMobile(emailOrMobile);
         await this.page.locator(this.firstNameField).fill(firstName);
         await this.page.locator(this.lastNameField).fill(lastName);
         await this.page.locator(this.addressField).fill(address);
         await this.page.locator(this.cityField).fill(city);
+    }
+
+    public async fillEmailOrMobile(emailOrMobile: string) {
+        await this.page.locator(this.emailOrMobileField).fill(emailOrMobile);
     }
 
     public async fillCreditCardDetails(cardNumber: string, cardExpiration: string, cardCvv: string, nameOnCard: string) {
@@ -35,5 +42,19 @@ export default class CheckoutPage extends BasePage{
 
     public async clickOnPayNowButton() {
         await this.page.locator(this.payNowButton).click();
+    }
+
+    public async validateInvalidEmailMessage() {
+        await this.validateTextContent(this.invalidEmailMessage, 'Enter a valid email');
+    }
+
+    public async validateInvalidCreditCard(){
+        await expect(this.page.locator(this.invalidCreditCardMessage)).toContainText('Enter a valid card number');
+    }
+
+    public async validateOrderBlocked(){
+        const initialUrl = this.page.url();
+        await this.clickOnPayNowButton();
+        expect(this.page.url()).toEqual(initialUrl);
     }
 }

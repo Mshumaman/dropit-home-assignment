@@ -1,4 +1,4 @@
-import {test} from "@playwright/test";
+import {expect, test} from "@playwright/test";
 import BasePage from "../pages/BasePage";
 import LoginPage from "../pages/LoginPage";
 import HomePage, {navBarOptionsEnum} from "../pages/HomePage";
@@ -7,6 +7,7 @@ import CartPage from "../pages/CartPage";
 import CheckoutPage from "../pages/CheckoutPage";
 import RandomGenerator from "../Helpers/Randomizer";
 import ConfirmationPage from "../pages/ConfirmationPage";
+import {DROPIT_PASSWORD, DROPIT_URL, MAIN_PRODUCT, SECONDARY_PRODUCT} from "../Helpers/TestData";
 
 
 test.describe('E2E Purchase Flow for Dropit Assignment', () => {
@@ -19,7 +20,7 @@ test.describe('E2E Purchase Flow for Dropit Assignment', () => {
     let randomizer: RandomGenerator;
     let confirmationPage: ConfirmationPage
 
-    test.only('Positive scenario of E2E Purchase Flow', async ({page}) => {
+    test.only('Negative scenario of E2E Purchase Flow', async ({page}) => {
         basePage = new BasePage(page);
         loginPage = new LoginPage(page);
         homePage = new HomePage(page);
@@ -37,12 +38,12 @@ test.describe('E2E Purchase Flow for Dropit Assignment', () => {
 
 
         await test.step('Navigate to Dropit Application', async () => {
-            await basePage.loadApplication('https://drpt-external-dev.myshopify.com/password');
+            await basePage.loadApplication(DROPIT_URL);
 
         });
 
         await test.step('Log in with valid credentials', async () => {
-            await loginPage.loginApplication('giclao');
+            await loginPage.loginApplication(DROPIT_PASSWORD);
         });
 
         await test.step('Navigate to Catalog from Navigation Bar', async () => {
@@ -50,23 +51,19 @@ test.describe('E2E Purchase Flow for Dropit Assignment', () => {
         });
 
         await test.step('Search and select Dropit Hamburger', async () => {
-            await homePage.searchAndSelectProduct('Dropit Hamburger (QA Automation)');
+            await homePage.searchAndSelectProduct(MAIN_PRODUCT);
         });
 
         await test.step('Add items to Cart: 2 Medium Dropit Hamburgers and 1 Extra Large Hamburger', async () => {
-            await selectSizeAndAddToCart(optionsEnum.Medium, '2');
-            await selectSizeAndAddToCart(optionsEnum.So_large_you_cant_eat_it, '1');
-            await homePage.validateProductsInCart('3');
+            await selectSizeAndAddToCart(optionsEnum.Small, '1');
         });
 
         await test.step('Search and select Dropit Chips', async () => {
-            await homePage.searchAndSelectProduct('Dropit Chips');
+            await homePage.searchAndSelectProduct(SECONDARY_PRODUCT);
         });
 
         await test.step('Add items to Cart: 2 Large Dropit Chips and 1 Extra Large Chips', async () => {
-            await selectSizeAndAddToCart(optionsEnum.Large, '2');
-            await selectSizeAndAddToCart(optionsEnum.Too_much_for_you_to_handle, '1');
-            await homePage.validateProductsInCart('6');
+            await selectSizeAndAddToCart(optionsEnum.Medium, '1');
         });
 
         await test.step('Proceed to Checkout from Cart', async () => {
@@ -76,20 +73,22 @@ test.describe('E2E Purchase Flow for Dropit Assignment', () => {
         });
 
         await test.step('Fill in Checkout Information', async () => {
-            await checkoutPage.fillPersonalDetails(randomEmail, randomFirstName, randomLastName, randomAddress, randomCity);
+            await checkoutPage.fillPersonalDetails('!@#!%#!%@#', randomFirstName, randomLastName, randomAddress, randomCity);
+            await checkoutPage.validateInvalidEmailMessage()
+            await checkoutPage.fillEmailOrMobile(randomEmail);
         });
 
         await test.step('Enter Credit Card Details', async () => {
-            await checkoutPage.fillCreditCardDetails('1', '12/26', '777', 'Bogus Gateway')
+            await checkoutPage.fillCreditCardDetails('12312312312312', '12/26', '777', 'Bogus Gateway')
         });
 
         await test.step('Complete Purchase', async () => {
             await checkoutPage.clickOnPayNowButton();
+            await checkoutPage.validateInvalidCreditCard()
         });
 
-        await test.step('Confirm Successful Purchase', async () => {
-            await confirmationPage.validateConfirmationMessage('Confirmation');
-            await page.waitForTimeout(5000);
+        await test.step('Validate user cannot place the order', async () => {
+            await checkoutPage.validateOrderBlocked();
         });
     });
 
