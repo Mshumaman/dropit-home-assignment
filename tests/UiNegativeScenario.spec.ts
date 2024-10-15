@@ -81,6 +81,7 @@ test.describe('E2E Negative Scenario: Validating Error Handling on Invalid Check
         });
 
         await test.step('Fill in Checkout Information with Invalid Email', async () => {
+            await checkoutPage.selectCountryOrRegion();
             await checkoutPage.fillPersonalDetails(INVALID_EMAIL, randomFirstName, randomLastName, randomAddress, randomCity);
             await checkoutPage.validateInvalidEmailMessage();
             await checkoutPage.validateInvalidEmailFieldColor();

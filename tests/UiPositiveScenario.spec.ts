@@ -92,6 +92,7 @@ test.describe('E2E Purchase Flow for Dropit Assignment', () => {
         });
 
         await test.step('Fill in Checkout Information', async () => {
+            await checkoutPage.selectCountryOrRegion();
             await checkoutPage.fillPersonalDetails(randomEmail, randomFirstName, randomLastName, randomAddress, randomCity);
         });
 

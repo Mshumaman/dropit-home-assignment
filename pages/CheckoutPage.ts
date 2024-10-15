@@ -3,10 +3,10 @@ import {expect} from "@playwright/test";
 
 export default class CheckoutPage extends BasePage {
     private emailOrMobileField = '[id="email"]';
-    private firstNameField = '[id="TextField0"]';
-    private lastNameField = '[id="TextField1"]';
-    private addressField = '[id="TextField2"]';
-    private cityField = '[id="TextField5"]';
+    private firstNameField = '[placeholder="First name (optional)"]';
+    private lastNameField = '[placeholder="Last name"]';
+    private addressField = '[placeholder="Address"]';
+    private cityField = '[placeholder="City"]';
     private carNumberField = 'iframe[name*="card-fields-number-"]';
     private cardExpirationField = 'iframe[name*="card-fields-expiry-"]';
     private cardCvvField = 'iframe[name*="card-fields-verification_value-"]';
@@ -20,13 +20,16 @@ export default class CheckoutPage extends BasePage {
     private totalAmountSelector = '[class*="w _19gi7yt2 n"]';
 
 
-    public async fillPersonalDetails(emailOrMobile: string, firstName: string, lastName: string, address: string, city: string, country: string = 'IL') {
+    public async fillPersonalDetails(emailOrMobile: string, firstName: string, lastName: string, address: string, city: string) {
         await this.fillEmailOrMobile(emailOrMobile);
-        await this.page.locator(this.countryOrRegionDropDown).selectOption(country);
         await this.page.locator(this.firstNameField).fill(firstName);
         await this.page.locator(this.lastNameField).fill(lastName);
         await this.page.locator(this.addressField).fill(address);
         await this.page.locator(this.cityField).fill(city);
+    }
+
+    public async selectCountryOrRegion(country: string = 'IL'){
+        await this.page.locator(this.countryOrRegionDropDown).selectOption(country);
     }
 
     public async fillEmailOrMobile(emailOrMobile: string) {
@@ -74,6 +77,7 @@ export default class CheckoutPage extends BasePage {
     }
 
     public async validateTotalAmount(totalAmount: string) {
+        await this.page.locator(this.shippingCalculation).waitFor({state: 'hidden'})
         await this.validateTextContent(this.totalAmountSelector, totalAmount);
     }
 }
