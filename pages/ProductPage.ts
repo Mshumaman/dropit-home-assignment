@@ -1,11 +1,11 @@
 import BasePage from "./BasePage";
 
 export enum optionsEnum {
-    Small = 'Small',
-    Medium = 'Medium',
-    Large = 'Large',
-    So_large_you_cant_eat_it = 'So large you can’t eat it',
-    Too_much_for_you_to_handle = 'Too much for you to handle'
+    SMALL = 'Small',
+    MEDIUM = 'Medium',
+    LARGE = 'Large',
+    SO_LARGE_YOU_CANT_EAT_IT = 'So large you can\'t eat it',
+    TOO_MUCH_FOR_YOU_TO_HANDLE = 'Too much for you to handle'
 }
 
 export default class ProductPage extends BasePage {

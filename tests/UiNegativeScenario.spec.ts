@@ -1,4 +1,4 @@
-import {expect, test} from "@playwright/test";
+import {test} from "@playwright/test";
 import BasePage from "../pages/BasePage";
 import LoginPage from "../pages/LoginPage";
 import HomePage, {navBarOptionsEnum} from "../pages/HomePage";
@@ -6,11 +6,20 @@ import ProductPage, {optionsEnum} from "../pages/ProductPage";
 import CartPage from "../pages/CartPage";
 import CheckoutPage from "../pages/CheckoutPage";
 import RandomGenerator from "../Helpers/Randomizer";
-import ConfirmationPage from "../pages/ConfirmationPage";
-import {DROPIT_PASSWORD, DROPIT_URL, MAIN_PRODUCT, SECONDARY_PRODUCT} from "../Helpers/TestData";
+import {
+    CC_CVV,
+    CC_EXPIRY,
+    CC_INVALID_NUMBER,
+    CC_NAME,
+    DROPIT_PASSWORD,
+    DROPIT_URL,
+    INVALID_EMAIL,
+    MAIN_PRODUCT,
+    SECONDARY_PRODUCT
+} from "../Helpers/TestData";
 
 
-test.describe('E2E Purchase Flow for Dropit Assignment', () => {
+test.describe('E2E Negative Scenario: Validating Error Handling on Invalid Checkout Inputs', () => {
     let basePage: BasePage;
     let loginPage: LoginPage;
     let homePage: HomePage;
@@ -18,9 +27,8 @@ test.describe('E2E Purchase Flow for Dropit Assignment', () => {
     let cartPage: CartPage;
     let checkoutPage: CheckoutPage;
     let randomizer: RandomGenerator;
-    let confirmationPage: ConfirmationPage
 
-    test('Negative scenario of E2E Purchase Flow', async ({page}) => {
+    test('Negative E2E Purchase Flow - Invalid Email and Credit Card Validation', async ({page}) => {
         basePage = new BasePage(page);
         loginPage = new LoginPage(page);
         homePage = new HomePage(page);
@@ -28,7 +36,6 @@ test.describe('E2E Purchase Flow for Dropit Assignment', () => {
         cartPage = new CartPage(page);
         checkoutPage = new CheckoutPage(page);
         randomizer = new RandomGenerator();
-        confirmationPage = new ConfirmationPage(page);
 
         const randomEmail = randomizer.getRandomMail;
         const randomAddress = randomizer.getRandomAddress;
@@ -43,7 +50,7 @@ test.describe('E2E Purchase Flow for Dropit Assignment', () => {
 
         });
 
-        await test.step('Log in with valid credentials', async () => {
+        await test.step('Log in with Valid Credentials', async () => {
             await loginPage.loginApplication(DROPIT_PASSWORD);
         });
 
@@ -51,44 +58,46 @@ test.describe('E2E Purchase Flow for Dropit Assignment', () => {
             await homePage.selectFromNavigationBar(navBarOptionsEnum.Catalog);
         });
 
-        await test.step('Search and select Dropit Hamburger', async () => {
+        await test.step('Search and Select Dropit Hamburger', async () => {
             await homePage.searchAndSelectProduct(MAIN_PRODUCT);
         });
 
         await test.step('Add items to Cart: 2 Medium Dropit Hamburgers and 1 Extra Large Hamburger', async () => {
-            await selectSizeAndAddToCart(optionsEnum.Small, '1');
+            await selectSizeAndAddToCart(optionsEnum.SMALL, '1');
         });
 
         await test.step('Search and select Dropit Chips', async () => {
             await homePage.searchAndSelectProduct(SECONDARY_PRODUCT);
         });
 
-        await test.step('Add items to Cart: 2 Large Dropit Chips and 1 Extra Large Chips', async () => {
-            await selectSizeAndAddToCart(optionsEnum.Medium, '1');
+        await test.step('Add Chips to Cart', async () => {
+            await selectSizeAndAddToCart(optionsEnum.MEDIUM, '1');
         });
 
         await test.step('Proceed to Checkout from Cart', async () => {
             await homePage.clickOnBagIcon();
-            await cartPage.validateCartTitle()
+            await cartPage.validateCartTitle();
             await cartPage.clickOnCheckoutButton();
         });
 
-        await test.step('Fill in Checkout Information', async () => {
-            await checkoutPage.fillPersonalDetails('!@#!%#!%@#', randomFirstName, randomLastName, randomAddress, randomCity);
-            await checkoutPage.validateInvalidEmailMessage()
+        await test.step('Fill in Checkout Information with Invalid Email', async () => {
+            await checkoutPage.fillPersonalDetails(INVALID_EMAIL, randomFirstName, randomLastName, randomAddress, randomCity);
+            await checkoutPage.validateInvalidEmailMessage();
+            await checkoutPage.validateInvalidEmailFieldColor();
             await checkoutPage.fillEmailOrMobile(randomEmail);
         });
 
-        await test.step('Enter Credit Card Details', async () => {
-            await checkoutPage.fillCreditCardDetails('12312312312312', '12/26', '777', 'Bogus Gateway')
+        await test.step('Enter Credit Card Details with Invalid Number', async () => {
+            await checkoutPage.fillCreditCardDetails(CC_INVALID_NUMBER, CC_EXPIRY, CC_CVV, CC_NAME);
         });
 
-        await test.step('Complete Purchase', async () => {
+        await test.step('Attempt to Complete Purchase', async () => {
             await checkoutPage.clickOnPayNowButton();
-            await checkoutPage.validateInvalidCreditCard()
+            await checkoutPage.validateInvalidCreditCard();
+            await checkoutPage.validateInvalidCreditCardFieldColor();
         });
 
-        await test.step('Validate user cannot place the order', async () => {
+        await test.step('Validate Order Placement Block', async () => {
             await checkoutPage.validateOrderBlocked();
         });
     });

@@ -7,7 +7,16 @@ import CartPage from "../pages/CartPage";
 import CheckoutPage from "../pages/CheckoutPage";
 import RandomGenerator from "../Helpers/Randomizer";
 import ConfirmationPage from "../pages/ConfirmationPage";
-import {DROPIT_PASSWORD, DROPIT_URL, MAIN_PRODUCT, SECONDARY_PRODUCT} from "../Helpers/TestData";
+import {
+    CC_CVV,
+    CC_EXPIRY,
+    CC_NAME,
+    CC_NUMBER,
+    DROPIT_PASSWORD,
+    DROPIT_URL,
+    MAIN_PRODUCT,
+    SECONDARY_PRODUCT, SUBTOTAL_AMOUNT, TOTAL_AMOUNT
+} from "../Helpers/TestData";
 
 
 test.describe('E2E Purchase Flow for Dropit Assignment', () => {
@@ -56,8 +65,8 @@ test.describe('E2E Purchase Flow for Dropit Assignment', () => {
         });
 
         await test.step('Add items to Cart: 2 Medium Dropit Hamburgers and 1 Extra Large Hamburger', async () => {
-            await selectSizeAndAddToCart(optionsEnum.Medium, '2');
-            await selectSizeAndAddToCart(optionsEnum.So_large_you_cant_eat_it, '1');
+            await selectSizeAndAddToCart(optionsEnum.MEDIUM, '2');
+            await selectSizeAndAddToCart(optionsEnum.SO_LARGE_YOU_CANT_EAT_IT, '1');
             await homePage.validateProductsInCart('3');
         });
 
@@ -66,15 +75,20 @@ test.describe('E2E Purchase Flow for Dropit Assignment', () => {
         });
 
         await test.step('Add items to Cart: 2 Large Dropit Chips and 1 Extra Large Chips', async () => {
-            await selectSizeAndAddToCart(optionsEnum.Large, '2');
-            await selectSizeAndAddToCart(optionsEnum.Too_much_for_you_to_handle, '1');
+            await selectSizeAndAddToCart(optionsEnum.LARGE, '2');
+            await selectSizeAndAddToCart(optionsEnum.TOO_MUCH_FOR_YOU_TO_HANDLE, '1');
             await homePage.validateProductsInCart('6');
         });
 
         await test.step('Proceed to Checkout from Cart', async () => {
             await homePage.clickOnBagIcon();
-            await cartPage.validateCartTitle()
+            await cartPage.validateCartTitle();
+            await cartPage.validateSubTotalAmount(SUBTOTAL_AMOUNT);
             await cartPage.clickOnCheckoutButton();
+        });
+
+        await test.step('Validate Total Amount', async () => {
+            await checkoutPage.validateTotalAmount(TOTAL_AMOUNT);
         });
 
         await test.step('Fill in Checkout Information', async () => {
@@ -82,7 +96,7 @@ test.describe('E2E Purchase Flow for Dropit Assignment', () => {
         });
 
         await test.step('Enter Credit Card Details', async () => {
-            await checkoutPage.fillCreditCardDetails('1', '12/26', '777', 'Bogus Gateway')
+            await checkoutPage.fillCreditCardDetails(CC_NUMBER, CC_EXPIRY, CC_CVV, CC_NAME);
         });
 
         await test.step('Complete Purchase', async () => {
@@ -95,8 +109,8 @@ test.describe('E2E Purchase Flow for Dropit Assignment', () => {
     });
 
     async function selectSizeAndAddToCart(size: optionsEnum, quantity: string) {
-        await productPage.selectSize(size);
         await productPage.setQuantity(quantity);
+        await productPage.selectSize(size);
         await productPage.addItemToCart();
     }
 });

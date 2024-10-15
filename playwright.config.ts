@@ -53,6 +53,10 @@ export default defineConfig({
             mode: "retain-on-failure",
         },
         actionTimeout: 30000,
+        launchOptions: {
+            slowMo: 250,
+            args: ['--start-maximized']
+        }
     },
 
 });

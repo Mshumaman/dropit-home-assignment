@@ -33,6 +33,12 @@ export default class BasePage {
         await expect(locator).toContainText(expectedText);
     }
 
+    public async validateElementColor(locator: Locator, cssProperty: string, expectedColor: string) {
+        const actualColor = await locator.evaluate((el, property) => {
+            return window.getComputedStyle(el).getPropertyValue(property);
+        }, cssProperty);
+        expect(actualColor).toEqual(expectedColor);
+    }
 
     public async getTextContent(element: string) {
         return await this.page.locator(element).textContent();

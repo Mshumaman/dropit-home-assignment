@@ -14,10 +14,15 @@ export default class CheckoutPage extends BasePage {
     private payNowButton = '[id="checkout-pay-button"]';
     private invalidEmailMessage = '#error-for-email';
     private invalidCreditCardMessage = '#error-for-number';
+    private countryOrRegionDropDown = '[name="countryCode"]';
+    private shippingCalculation = '[class*="_19gi7ytn _19gi7ytj"]';
+    private emailBorderSelector = '[class*="_7ozb2u7"]';
+    private totalAmountSelector = '[class*="w _19gi7yt2 n"]';
 
 
-    public async fillPersonalDetails(emailOrMobile: string, firstName: string, lastName: string, address: string, city: string) {
+    public async fillPersonalDetails(emailOrMobile: string, firstName: string, lastName: string, address: string, city: string, country: string = 'IL') {
         await this.fillEmailOrMobile(emailOrMobile);
+        await this.page.locator(this.countryOrRegionDropDown).selectOption(country);
         await this.page.locator(this.firstNameField).fill(firstName);
         await this.page.locator(this.lastNameField).fill(lastName);
         await this.page.locator(this.addressField).fill(address);
@@ -41,12 +46,21 @@ export default class CheckoutPage extends BasePage {
     }
 
     public async clickOnPayNowButton() {
-        await this.page.waitForLoadState('networkidle')
+        await this.page.locator(this.shippingCalculation).waitFor({state: 'hidden'})
         await this.page.locator(this.payNowButton).click();
     }
 
     public async validateInvalidEmailMessage() {
         await this.validateTextContent(this.invalidEmailMessage, 'Enter a valid email');
+    }
+
+    public async validateInvalidEmailFieldColor() {
+        await this.validateElementColor(this.page.locator(this.invalidEmailMessage), 'color', 'rgb(221, 29, 29)');
+        await this.validateElementColor(this.page.locator(this.emailBorderSelector), 'border-bottom-color', 'rgb(221, 29, 29)');
+    }
+
+    public async validateInvalidCreditCardFieldColor() {
+        await this.validateElementColor(this.page.locator(this.invalidCreditCardMessage), 'color', 'rgb(221, 29, 29)');
     }
 
     public async validateInvalidCreditCard() {
@@ -57,5 +71,9 @@ export default class CheckoutPage extends BasePage {
         const initialUrl = this.page.url();
         await this.clickOnPayNowButton();
         expect(this.page.url()).toEqual(initialUrl);
+    }
+
+    public async validateTotalAmount(totalAmount: string) {
+        await this.validateTextContent(this.totalAmountSelector, totalAmount);
     }
 }
