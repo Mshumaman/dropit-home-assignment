@@ -1,7 +1,7 @@
 import BasePage from "./BasePage";
 import {expect} from "@playwright/test";
 
-export default class CheckoutPage extends BasePage{
+export default class CheckoutPage extends BasePage {
     private emailOrMobileField = '[id="email"]';
     private firstNameField = '[id="TextField0"]';
     private lastNameField = '[id="TextField1"]';
@@ -41,6 +41,7 @@ export default class CheckoutPage extends BasePage{
     }
 
     public async clickOnPayNowButton() {
+        await this.page.waitForLoadState('networkidle')
         await this.page.locator(this.payNowButton).click();
     }
 
@@ -48,11 +49,11 @@ export default class CheckoutPage extends BasePage{
         await this.validateTextContent(this.invalidEmailMessage, 'Enter a valid email');
     }
 
-    public async validateInvalidCreditCard(){
+    public async validateInvalidCreditCard() {
         await expect(this.page.locator(this.invalidCreditCardMessage)).toContainText('Enter a valid card number');
     }
 
-    public async validateOrderBlocked(){
+    public async validateOrderBlocked() {
         const initialUrl = this.page.url();
         await this.clickOnPayNowButton();
         expect(this.page.url()).toEqual(initialUrl);

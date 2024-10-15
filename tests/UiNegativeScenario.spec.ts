@@ -38,6 +38,7 @@ test.describe('E2E Purchase Flow for Dropit Assignment', () => {
 
 
         await test.step('Navigate to Dropit Application', async () => {
+            await page.setViewportSize({width: 1440, height: 900});
             await basePage.loadApplication(DROPIT_URL);
 
         });
