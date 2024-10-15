@@ -20,7 +20,7 @@ test.describe('E2E Purchase Flow for Dropit Assignment', () => {
     let randomizer: RandomGenerator;
     let confirmationPage: ConfirmationPage
 
-    test.only('Negative scenario of E2E Purchase Flow', async ({page}) => {
+    test('Negative scenario of E2E Purchase Flow', async ({page}) => {
         basePage = new BasePage(page);
         loginPage = new LoginPage(page);
         homePage = new HomePage(page);
