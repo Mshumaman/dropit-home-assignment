@@ -23,10 +23,6 @@ export default class RandomGenerator {
         return faker.internet.email();
     }
 
-    public get getRandomPhone(): string {
-        return faker.phone.number();
-    }
-
 }
 
 

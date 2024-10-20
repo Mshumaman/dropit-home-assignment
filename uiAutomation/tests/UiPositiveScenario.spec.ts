@@ -5,21 +5,23 @@ import HomePage, {navBarOptionsEnum} from "../pages/HomePage";
 import ProductPage, {optionsEnum} from "../pages/ProductPage";
 import CartPage from "../pages/CartPage";
 import CheckoutPage from "../pages/CheckoutPage";
-import RandomGenerator from "../Helpers/Randomizer";
+import RandomGenerator from "../../Helpers/Randomizer";
+import ConfirmationPage from "../pages/ConfirmationPage";
 import {
     CC_CVV,
     CC_EXPIRY,
-    CC_INVALID_NUMBER,
     CC_NAME,
+    CC_NUMBER,
     DROPIT_PASSWORD,
     DROPIT_URL,
-    INVALID_EMAIL,
     MAIN_PRODUCT,
-    SECONDARY_PRODUCT
-} from "../Helpers/TestData";
+    SECONDARY_PRODUCT,
+    SUBTOTAL_AMOUNT,
+    TOTAL_AMOUNT
+} from "../../Helpers/TestData";
 
 
-test.describe('E2E Negative Scenario: Validating Error Handling on Invalid Checkout Inputs', () => {
+test.describe('E2E Purchase Flow for Dropit Assignment', {tag: '@uiAutomation'}, () => {
     let basePage: BasePage;
     let loginPage: LoginPage;
     let homePage: HomePage;
@@ -27,8 +29,9 @@ test.describe('E2E Negative Scenario: Validating Error Handling on Invalid Check
     let cartPage: CartPage;
     let checkoutPage: CheckoutPage;
     let randomizer: RandomGenerator;
+    let confirmationPage: ConfirmationPage
 
-    test('Negative E2E Purchase Flow - Invalid Email and Credit Card Validation', async ({page}) => {
+    test('Positive scenario of E2E Purchase Flow', async ({page}) => {
         basePage = new BasePage(page);
         loginPage = new LoginPage(page);
         homePage = new HomePage(page);
@@ -36,6 +39,7 @@ test.describe('E2E Negative Scenario: Validating Error Handling on Invalid Check
         cartPage = new CartPage(page);
         checkoutPage = new CheckoutPage(page);
         randomizer = new RandomGenerator();
+        confirmationPage = new ConfirmationPage(page);
 
         const randomEmail = randomizer.getRandomMail;
         const randomAddress = randomizer.getRandomAddress;
@@ -50,7 +54,7 @@ test.describe('E2E Negative Scenario: Validating Error Handling on Invalid Check
 
         });
 
-        await test.step('Log in with Valid Credentials', async () => {
+        await test.step('Log in with valid credentials', async () => {
             await loginPage.loginApplication(DROPIT_PASSWORD);
         });
 
@@ -58,54 +62,58 @@ test.describe('E2E Negative Scenario: Validating Error Handling on Invalid Check
             await homePage.selectFromNavigationBar(navBarOptionsEnum.Catalog);
         });
 
-        await test.step('Search and Select Dropit Hamburger', async () => {
+        await test.step('Search and select Dropit Hamburger', async () => {
             await homePage.searchAndSelectProduct(MAIN_PRODUCT);
         });
 
         await test.step('Add items to Cart: 2 Medium Dropit Hamburgers and 1 Extra Large Hamburger', async () => {
-            await selectSizeAndAddToCart(optionsEnum.SMALL, '1');
+            await selectSizeAndAddToCart(optionsEnum.MEDIUM, '2');
+            await selectSizeAndAddToCart(optionsEnum.SO_LARGE_YOU_CANT_EAT_IT, '1');
+            await homePage.validateProductsInCart('3');
         });
 
         await test.step('Search and select Dropit Chips', async () => {
             await homePage.searchAndSelectProduct(SECONDARY_PRODUCT);
         });
 
-        await test.step('Add Chips to Cart', async () => {
-            await selectSizeAndAddToCart(optionsEnum.MEDIUM, '1');
+        await test.step('Add items to Cart: 2 Large Dropit Chips and 1 Extra Large Chips', async () => {
+            await selectSizeAndAddToCart(optionsEnum.LARGE, '2');
+            await selectSizeAndAddToCart(optionsEnum.TOO_MUCH_FOR_YOU_TO_HANDLE, '1');
+            await homePage.validateProductsInCart('6');
         });
 
         await test.step('Proceed to Checkout from Cart', async () => {
             await homePage.clickOnBagIcon();
             await cartPage.validateCartTitle();
+            await cartPage.validateSubTotalAmount(SUBTOTAL_AMOUNT);
             await cartPage.clickOnCheckoutButton();
         });
 
-        await test.step('Fill in Checkout Information with Invalid Email', async () => {
+        await test.step('Fill in Checkout Information', async () => {
             await checkoutPage.selectCountryOrRegion();
-            await checkoutPage.fillPersonalDetails(INVALID_EMAIL, randomFirstName, randomLastName, randomAddress, randomCity);
-            await checkoutPage.validateInvalidEmailMessage();
-            await checkoutPage.validateInvalidEmailFieldColor();
-            await checkoutPage.fillEmailOrMobile(randomEmail);
+            await checkoutPage.fillPersonalDetails(randomEmail, randomFirstName, randomLastName, randomAddress, randomCity);
         });
 
-        await test.step('Enter Credit Card Details with Invalid Number', async () => {
-            await checkoutPage.fillCreditCardDetails(CC_INVALID_NUMBER, CC_EXPIRY, CC_CVV, CC_NAME);
+        await test.step('Enter Credit Card Details', async () => {
+            await checkoutPage.fillCreditCardDetails(CC_NUMBER, CC_EXPIRY, CC_CVV, CC_NAME);
         });
 
-        await test.step('Attempt to Complete Purchase', async () => {
+        await test.step('Validate Total Amount', async () => {
+            await checkoutPage.validateTotalAmount(TOTAL_AMOUNT);
+        });
+
+        await test.step('Complete Purchase', async () => {
             await checkoutPage.clickOnPayNowButton();
-            await checkoutPage.validateInvalidCreditCard();
-            await checkoutPage.validateInvalidCreditCardFieldColor();
         });
 
-        await test.step('Validate Order Placement Block', async () => {
-            await checkoutPage.validateOrderBlocked();
+        await test.step('Confirm Successful Purchase', async () => {
+            await confirmationPage.validateConfirmationMessage();
         });
     });
 
     async function selectSizeAndAddToCart(size: optionsEnum, quantity: string) {
-        await productPage.selectSize(size);
         await productPage.setQuantity(quantity);
+        await productPage.selectSize(size);
         await productPage.addItemToCart();
     }
 });
