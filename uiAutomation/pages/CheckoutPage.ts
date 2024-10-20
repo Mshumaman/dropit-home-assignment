@@ -49,7 +49,7 @@ export default class CheckoutPage extends BasePage {
     }
 
     public async clickOnPayNowButton() {
-        await this.page.locator(this.shippingCalculation).waitFor({state: 'hidden'})
+        await this.page.locator(this.shippingCalculation).waitFor({state: 'hidden'});
         await this.page.locator(this.payNowButton).click();
     }
 
@@ -77,7 +77,7 @@ export default class CheckoutPage extends BasePage {
     }
 
     public async validateTotalAmount(totalAmount: string) {
-        await this.page.locator(this.shippingCalculation).waitFor({state: 'hidden'})
+        await this.page.locator(this.shippingCalculation).waitFor({state: 'hidden'});
         await this.validateTextContent(this.totalAmountSelector, totalAmount);
     }
 }

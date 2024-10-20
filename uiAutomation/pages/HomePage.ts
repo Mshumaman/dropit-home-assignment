@@ -33,7 +33,7 @@ export default class HomePage extends BasePage {
     }
 
     public async selectProduct() {
-        await this.page.locator(this.cardInformation).click()
+        await this.page.locator(this.cardInformation).click();
     }
 
     public async validateProductsInCart(amount: string) {

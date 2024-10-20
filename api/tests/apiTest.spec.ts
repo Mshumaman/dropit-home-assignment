@@ -86,7 +86,6 @@ test.describe('API Testing for Dropit Assignment', {tag:'@apiTests'} , () => {
             const jsonResponse: IResponse[] = await petResponse.json();
             expect(jsonResponse.length).toBeGreaterThan(0);
 
-
             for (const pet of jsonResponse) {
                 expect(pet.status).toBe('sold');
             }

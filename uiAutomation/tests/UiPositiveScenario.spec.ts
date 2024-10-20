@@ -5,7 +5,7 @@ import HomePage, {navBarOptionsEnum} from "../pages/HomePage";
 import ProductPage, {optionsEnum} from "../pages/ProductPage";
 import CartPage from "../pages/CartPage";
 import CheckoutPage from "../pages/CheckoutPage";
-import RandomGenerator from "../../Helpers/Randomizer";
+import RandomGenerator from "../../helpers/Randomizer";
 import ConfirmationPage from "../pages/ConfirmationPage";
 import {
     CC_CVV,
@@ -18,7 +18,7 @@ import {
     SECONDARY_PRODUCT,
     SUBTOTAL_AMOUNT,
     TOTAL_AMOUNT
-} from "../../Helpers/TestData";
+} from "../../helpers/TestData";
 
 
 test.describe('E2E Purchase Flow for Dropit Assignment', {tag: '@uiAutomation'}, () => {

@@ -5,7 +5,7 @@ import HomePage, {navBarOptionsEnum} from "../pages/HomePage";
 import ProductPage, {optionsEnum} from "../pages/ProductPage";
 import CartPage from "../pages/CartPage";
 import CheckoutPage from "../pages/CheckoutPage";
-import RandomGenerator from "../../Helpers/Randomizer";
+import RandomGenerator from "../../helpers/Randomizer";
 import {
     CC_CVV,
     CC_EXPIRY,
@@ -16,7 +16,7 @@ import {
     INVALID_EMAIL,
     MAIN_PRODUCT,
     SECONDARY_PRODUCT
-} from "../../Helpers/TestData";
+} from "../../helpers/TestData";
 
 
 test.describe('E2E Negative Scenario: Validating Error Handling on Invalid Checkout Inputs', {tag: '@uiAutomation'}, () => {

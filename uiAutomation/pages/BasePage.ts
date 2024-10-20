@@ -5,11 +5,9 @@ export default class BasePage {
     constructor(public page: Page) {
     }
 
-
     public async loadApplication(url: string) {
         await this.page.goto(url);
     }
-
 
     public async selectFromMultipleChoice(Element: string, value: string) {
         const Options = await this.page.locator(Element).all();
