@@ -28,8 +28,8 @@ For this part, I created a **PetApiClient** class, which encapsulates all the AP
 
 In this section, I answered a fun, hypothetical question about time travel. You can find both the **Hebrew** and **English** versions of my answer through the links below:
 
-- [Hebrew Answer](./path_to_hebrew_answer.md)
-- [English Answer](./path_to_english_answer.md)
+- [Hebrew Answer](docs/time_machine_answer_heb.md)
+- [English Answer](docs/time_machine_answer_eng.md)
 
 ## GitHub Actions Setup
 
